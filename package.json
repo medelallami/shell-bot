@@ -1,7 +1,7 @@
 {
   "name": "shell-bot",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "keywords": [
     "telegram",
     "bot",
@@ -11,17 +11,24 @@
   ],
   "description": "Shellrunner Telegram bot",
   "homepage": "https://github.com/botgram/shell-bot",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "botgram": "^2.2",
-    "escape-html": "1",
-    "mime": "1",
-    "node-pty": "^0.9.0",
-    "node-termios": "0.0.13",
-    "terminal.js": "1.0.9"
+    "botgram": "^2.2.0",
+    "escape-html": "^1.0.3",
+    "mime": "^3.0.0",
+    "node-pty": "^1.1.0",
+    "node-termios": "^0.2.0",
+    "terminal.js": "^1.0.11",
+    "wcwidth": "^1.0.1"
   },
   "optionalDependencies": {
-    "https-proxy-agent": "^5.0.0",
-    "socks-proxy-agent": "^4.0.1"
+    "https-proxy-agent": "^7.0.5",
+    "socks-proxy-agent": "^8.0.4"
   },
   "bugs": {
     "url": "https://github.com/botgram/shell-bot/issues"
