@@ -306,7 +306,7 @@ if (!fs.existsSync(CONFIG_FILE)) {
     });
 
     // Settings: Working dir
-    bot.command("cd", (msg, reply, next) => {
+    bot.command("cd", async (msg, reply, next) => {
       const arg = msg.args(1)[0];
       if (arg) {
         if (msg.context.command) {
@@ -315,7 +315,7 @@ if (!fs.existsSync(CONFIG_FILE)) {
         }
         const newdir = path.resolve(msg.context.cwd, arg);
         try {
-          fs.readdirSync(newdir);
+          await fs.promises.readdir(newdir);
           msg.context.cwd = newdir;
         } catch (err) {
           return reply.html("%s", err);
