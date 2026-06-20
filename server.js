@@ -314,17 +314,18 @@ if (!fs.existsSync(CONFIG_FILE)) {
           return reply.reply(command.initialMessage.id || msg).html("Can't change directory while a command is running.");
         }
         const newdir = path.resolve(msg.context.cwd, arg);
-        try {
-          fs.readdirSync(newdir);
+        fs.readdir(newdir, (err) => {
+          if (err) return reply.html("%s", err);
           msg.context.cwd = newdir;
-        } catch (err) {
-          return reply.html("%s", err);
-        }
+          reply.html("Now at: %s", msg.context.cwd).then((m) => {
+            msg.context.lastDirMessageId = m.id;
+          });
+        });
+      } else {
+        reply.html("Now at: %s", msg.context.cwd).then((m) => {
+          msg.context.lastDirMessageId = m.id;
+        });
       }
-
-      reply.html("Now at: %s", msg.context.cwd).then((m) => {
-        msg.context.lastDirMessageId = m.id;
-      });
     });
 
     // Settings: Environment
