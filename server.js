@@ -306,7 +306,7 @@ if (!fs.existsSync(CONFIG_FILE)) {
     });
 
     // Settings: Working dir
-    bot.command("cd", (msg, reply, next) => {
+    bot.command("cd", async (msg, reply, next) => {
       const arg = msg.args(1)[0];
       if (arg) {
         if (msg.context.command) {
@@ -314,8 +314,8 @@ if (!fs.existsSync(CONFIG_FILE)) {
           return reply.reply(command.initialMessage.id || msg).html("Can't change directory while a command is running.");
         }
         const newdir = path.resolve(msg.context.cwd, arg);
-        fs.readdir(newdir, (err) => {
-          if (err) return reply.html("%s", err);
+        try {
+          await fs.promises.readdir(newdir);
           msg.context.cwd = newdir;
           reply.html("Now at: %s", msg.context.cwd).then((m) => {
             msg.context.lastDirMessageId = m.id;
