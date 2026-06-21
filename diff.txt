@@ -1,0 +1,25 @@
+diff --git a/lib/editor.js b/lib/editor.js
+index 8991d25..46fc884 100644
+--- a/lib/editor.js
++++ b/lib/editor.js
+@@ -105,13 +105,14 @@ class Editor {
+       if (this.detached) return;
+       this.fileTouched = false;
+
+-      try {
+-        fs.writeFileSync(this.file, this.contents.text, this.encoding);
+-      } catch (e) {
+-        this.reply.html("Couldn't save file: %s", e.message);
+-        return;
+-      }
+-      this.message.edit(this._render());
++      fs.writeFile(this.file, this.contents.text, this.encoding, (e) => {
++        if (this.detached) return;
++        if (e) {
++          this.reply.html("Couldn't save file: %s", e.message);
++          return;
++        }
++        this.message.edit(this._render());
++      });
+     });
+   }
