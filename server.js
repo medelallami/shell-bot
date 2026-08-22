@@ -208,6 +208,10 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /file &lt;file&gt; to view or edit a file.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      const relative = path.relative(msg.context.cwd, fullPath);
+      if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        return reply.html("Access denied: Path is outside current working directory.");
+      }
       try {
         msg.context.editor = new Editor(reply, fullPath);
       } catch (e) {
