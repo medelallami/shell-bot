@@ -220,7 +220,11 @@ if (!fs.existsSync(CONFIG_FILE)) {
       if (Object.hasOwnProperty.call(fileUploads, msg.reply.id)) {
         file = fileUploads[msg.reply.id];
       } else if (msg.context.lastDirMessageId == msg.reply.id) {
-        file = path.join(msg.context.cwd, msg.filename || utils.constructFilename(msg));
+        file = path.resolve(msg.context.cwd, msg.filename || utils.constructFilename(msg));
+        const rel = path.relative(msg.context.cwd, file);
+        if (!rel || rel.startsWith("..") || path.isAbsolute(rel)) {
+          return reply.html("Invalid file path.");
+        }
       } else {
         return;
       }
