@@ -204,12 +204,12 @@ if (!fs.existsSync(CONFIG_FILE)) {
       });
     });
 
-    bot.command("file", (msg, reply, next) => {
+    bot.command("file", async (msg, reply, next) => {
       const file = msg.args();
       if (!file) return reply.html("Use /file &lt;file&gt; to view or edit a file.");
       const fullPath = path.resolve(msg.context.cwd, file);
       try {
-        msg.context.editor = new Editor(reply, fullPath);
+        msg.context.editor = await Editor.create(reply, fullPath);
       } catch (e) {
         return reply.html(`Couldn't open file: ${e.message}`);
       }
