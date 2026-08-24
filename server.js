@@ -197,6 +197,10 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /upload &lt;file&gt; to download a file from the server.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      const relative = path.relative(msg.context.cwd, fullPath);
+      if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        return reply.html("Access denied.");
+      }
       reply.action("upload_document").document(fullPath).then((m) => {
         fileUploads[m.id] = fullPath;
       }, (err) => {
