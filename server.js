@@ -346,6 +346,11 @@ if (!fs.existsSync(CONFIG_FILE)) {
 
         const value = key.substring(idx + 1);
         key = key.substring(0, idx).trim().replace(/\s+/g, " ");
+
+        if (utils.isProtectedEnvVar(key)) {
+          return reply.reply(msg).html("Modification of <code>" + escapeHtml(key) + "</code> is restricted for security reasons.");
+        }
+
         if (value.length) env[key] = value;
         else delete env[key];
       }
