@@ -197,6 +197,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /upload &lt;file&gt; to download a file from the server.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      if (!utils.isPathSafe(msg.context.cwd, fullPath)) {
+        return reply.html("Access denied.");
+      }
       reply.action("upload_document").document(fullPath).then((m) => {
         fileUploads[m.id] = fullPath;
       }, (err) => {
@@ -208,6 +211,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /file &lt;file&gt; to view or edit a file.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      if (!utils.isPathSafe(msg.context.cwd, fullPath)) {
+        return reply.html("Access denied.");
+      }
       try {
         msg.context.editor = new Editor(reply, fullPath);
       } catch (e) {
@@ -225,14 +231,19 @@ if (!fs.existsSync(CONFIG_FILE)) {
         return;
       }
 
+      const fullPath = path.resolve(msg.context.cwd, file);
+      if (!utils.isPathSafe(msg.context.cwd, fullPath)) {
+        return reply.html("Access denied.");
+      }
+
       try {
-        const stream = fs.createWriteStream(file);
+        const stream = fs.createWriteStream(fullPath);
         bot.fileStream(msg.file, (err, ostream) => {
           if (err) throw err;
           reply.action("typing");
           ostream.pipe(stream);
           ostream.on("end", () => {
-            reply.html(`File written: ${file}`);
+            reply.html(`File written: ${fullPath}`);
           });
         });
       } catch (e) {
