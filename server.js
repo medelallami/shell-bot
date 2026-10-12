@@ -220,7 +220,11 @@ if (!fs.existsSync(CONFIG_FILE)) {
       if (Object.hasOwnProperty.call(fileUploads, msg.reply.id)) {
         file = fileUploads[msg.reply.id];
       } else if (msg.context.lastDirMessageId == msg.reply.id) {
-        file = path.join(msg.context.cwd, msg.filename || utils.constructFilename(msg));
+        let filename = msg.filename ? path.basename(msg.filename.replace(/\\/g, "/")) : "";
+        if (!filename || filename === "." || filename === "..") {
+          filename = utils.constructFilename(msg);
+        }
+        file = path.join(msg.context.cwd, filename);
       } else {
         return;
       }
