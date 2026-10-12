@@ -320,7 +320,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
           reply.html("Now at: %s", msg.context.cwd).then((m) => {
             msg.context.lastDirMessageId = m.id;
           });
-        });
+        } catch (err) {
+          reply.html("Couldn't change directory.");
+        }
       } else {
         reply.html("Now at: %s", msg.context.cwd).then((m) => {
           msg.context.lastDirMessageId = m.id;
