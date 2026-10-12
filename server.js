@@ -197,6 +197,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /upload &lt;file&gt; to download a file from the server.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      if (!utils.isPathInside(msg.context.cwd, fullPath)) {
+        return reply.html("Access denied: path outside working directory.");
+      }
       reply.action("upload_document").document(fullPath).then((m) => {
         fileUploads[m.id] = fullPath;
       }, (err) => {
@@ -208,6 +211,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
       const file = msg.args();
       if (!file) return reply.html("Use /file &lt;file&gt; to view or edit a file.");
       const fullPath = path.resolve(msg.context.cwd, file);
+      if (!utils.isPathInside(msg.context.cwd, fullPath)) {
+        return reply.html("Access denied: path outside working directory.");
+      }
       try {
         msg.context.editor = new Editor(reply, fullPath);
       } catch (e) {
@@ -223,6 +229,10 @@ if (!fs.existsSync(CONFIG_FILE)) {
         file = path.join(msg.context.cwd, msg.filename || utils.constructFilename(msg));
       } else {
         return;
+      }
+
+      if (!utils.isPathInside(msg.context.cwd, file)) {
+        return reply.html("Access denied: path outside working directory.");
       }
 
       try {
