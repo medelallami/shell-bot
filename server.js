@@ -36,7 +36,7 @@ if (!fs.existsSync(CONFIG_FILE)) {
     });
 
 
-    function rootHook(msg, reply, next) {
+    async function rootHook(msg, reply, next) {
       if (msg.queued) return;
 
       let id = msg.chat.id;
@@ -66,16 +66,19 @@ if (!fs.existsSync(CONFIG_FILE)) {
         return;
       }
 
-      if (!contexts[id]) contexts[id] = {
-        id: id,
-        shell: utils.shells[0],
-        env: utils.getSanitizedEnv(),
-        cwd: defaultCwd,
-        size: {columns: 40, rows: 20},
-        silent: true,
-        interactive: false,
-        linkPreviews: false,
-      };
+      if (!contexts[id]) {
+        const shells = await utils.getShells();
+        contexts[id] = {
+          id: id,
+          shell: shells[0],
+          env: utils.getSanitizedEnv(),
+          cwd: defaultCwd,
+          size: {columns: 40, rows: 20},
+          silent: true,
+          interactive: false,
+          linkPreviews: false,
+        };
+      }
 
       msg.context = contexts[id];
       next();
@@ -278,7 +281,7 @@ if (!fs.existsSync(CONFIG_FILE)) {
     });
 
     // Settings: Shell
-    bot.command("shell", (msg, reply, next) => {
+    bot.command("shell", async (msg, reply, next) => {
       const arg = msg.args(1)[0];
       if (arg) {
         if (msg.context.command) {
@@ -294,7 +297,8 @@ if (!fs.existsSync(CONFIG_FILE)) {
         }
       } else {
         const shell = msg.context.shell;
-        const otherShells = utils.shells.slice(0);
+        const availableShells = await utils.getShells();
+        const otherShells = availableShells.slice(0);
         const idx = otherShells.indexOf(shell);
         if (idx !== -1) otherShells.splice(idx, 1);
 
@@ -320,7 +324,9 @@ if (!fs.existsSync(CONFIG_FILE)) {
           reply.html("Now at: %s", msg.context.cwd).then((m) => {
             msg.context.lastDirMessageId = m.id;
           });
-        });
+        } catch (e) {
+          return reply.reply(msg).html("Couldn't change directory.");
+        }
       } else {
         reply.html("Now at: %s", msg.context.cwd).then((m) => {
           msg.context.lastDirMessageId = m.id;
